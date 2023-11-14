@@ -55,6 +55,13 @@ Cypress.Commands.add('deleteProduto', () => {
     })
 })
 
+Cypress.Commands.add('listProdutos', () => {
+    cy.api({
+        method: 'GET',
+        url: `/produtos`
+      })    
+})
+
 Cypress.Commands.add('listProdutoId', (failOnStatusCode = true) => {
     cy.api({
       failOnStatusCode,

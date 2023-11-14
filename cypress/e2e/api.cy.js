@@ -12,65 +12,64 @@ beforeEach(() => {
   cy.postLogin()
 })
 
+function validateProductDetails(receivedProduct, expectedProduct) {
+  expect(receivedProduct.nome).to.equal(expectedProduct.nome);
+  expect(receivedProduct.preco).to.equal(expectedProduct.preco);
+  expect(receivedProduct.descricao).to.equal(expectedProduct.descricao);
+  expect(receivedProduct.quantidade).to.equal(expectedProduct.quantidade);
+}
+
+function validateMessage(res, expectedMessage, expectedStatus = 200) {
+  expect(res.status).to.eql(expectedStatus);
+  if (expectedMessage !== undefined) {
+    expect(res.body.message).to.equal(expectedMessage);
+  }
+}
+
 describe('CRUD - Produtos', () => {
 
-  it('Cadastrar produto com sucesso', () => {
+  it('Deve cadastrar produto com sucesso', () => {
     cy.postProduto(produto).then((res) => {
-      expect(res.status).to.eql(201)
-      expect(res.body.message).to.eql('Cadastro realizado com sucesso')
-      Cypress.env('produtoId', res.body._id)
-    })
-  })
-  
-  it('Listar produto pelo Id', () => {
-   cy.listProdutoId().then((res) => {
-      expect(res.status).to.eql(200)
-      expect(res.body.nome).to.equal(produto.nome)
-      expect(res.body.preco).to.equal(produto.preco)
-      expect(res.body.descricao).to.equal(produto.descricao)
-      expect(res.body.quantidade).to.equal(produto.quantidade)
-      expect(res.body._id).to.eql(Cypress.env('produtoId', res.body._id))
-    })
-  })
+      validateMessage(res, 'Cadastro realizado com sucesso', 201);
+      Cypress.env('produtoId', res.body._id);
+    });
+  });
 
-  it('Listar produtos', () => {
-    cy.api({
-      method: 'GET',
-      url: `/produtos`
-    }).then((res) => {
+  it('Deve listar produto pelo Id', () => {
+    cy.listProdutoId().then((res) => {
+      validateProductDetails(res.body, produto);
+      expect(res.body._id).to.eql(Cypress.env('produtoId'));
+    });
+  });
+
+  it('Deve listar produtos', () => {
+    cy.listProdutos().then((res) => {
       expect(res.status).to.eql(200)
     })
   })
 
-  it('Editar produto', () => {
+  it('Deve editar produto', () => {
     cy.putProduto(produto).then((res) => {
-      expect(res.status).to.eql(200)
-      expect(res.body.message).to.equal('Registro alterado com sucesso')
-    })
+      validateMessage(res, 'Registro alterado com sucesso');
+    });
 
-    cy.log('consultando produto pelo Id')
+    cy.log('Consultando produto pelo Id');
 
     cy.listProdutoId().then((res) => {
-      expect(res.status).to.eql(200)
-      expect(res.body.nome).to.equal(produto.putNome)
-      expect(res.body.preco).to.equal(produto.preco)
-      expect(res.body.descricao).to.equal(produto.descricao)
-      expect(res.body.quantidade).to.equal(produto.quantidade)
-      expect(res.body._id).to.eql(Cypress.env('produtoId', res.body._id))
-    })
-  })
+      validateProductDetails(res.body, { ...produto, nome: produto.putNome });
+      expect(res.body._id).to.eql(Cypress.env('produtoId'));
+    });
+  });
 
-  it('Excluir produto', () => {
+  it('Deve excluir produto', () => {
     cy.deleteProduto().then((res) => {
-      expect(res.status).to.eql(200)
-      expect(res.body.message).to.equal('Registro excluído com sucesso')
-    })
+      validateMessage(res, 'Registro excluído com sucesso');
+    });
 
-    cy.log('Validando que o produto foi excluido, consultando pelo ID')
+    cy.log('Validando que o produto foi excluído, consultando pelo ID');
 
     cy.listProdutoId(false).then((res) => {
-      expect(res.status).to.eql(400)
-      expect(res.body.message).to.equal('Produto não encontrado')
-    })
-  })
-})
+      validateMessage(res, 'Produto não encontrado', 400);
+    });
+  });
+});
