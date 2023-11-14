@@ -28,3 +28,38 @@ Cypress.Commands.add('postProduto', (produto) => {
         }
     })
 })
+
+Cypress.Commands.add('putProduto', (produto) => {
+    cy.api({
+        headers: {
+            Authorization: `${Cypress.env('auth')}`,
+        },
+        method: 'PUT',
+        url: `/produtos/${Cypress.env('produtoId')}`,
+        body: {
+            "nome": produto.putNome,
+            "preco": produto.preco,
+            "descricao": produto.descricao,
+            "quantidade": produto.quantidade
+        }
+    })
+})
+
+Cypress.Commands.add('deleteProduto', () => {
+    cy.api({
+        headers: {
+            Authorization: `${Cypress.env('auth')}`,
+        },
+        method: 'DELETE',
+        url: `/produtos/${Cypress.env('produtoId')}`,
+    })
+})
+
+Cypress.Commands.add('listProdutoId', (failOnStatusCode = true) => {
+    cy.api({
+      failOnStatusCode,
+      method: 'GET',
+      url: `/produtos/${Cypress.env('produtoId')}`
+    });
+  });
+  
