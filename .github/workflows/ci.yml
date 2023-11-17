@@ -1,21 +1,21 @@
-name: End-to-end tests
-on: push
+name: ProdutoApi
+on: [push]
 jobs:
   cypress-run:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Cypress run
+      - name: Cypress Run
         uses: cypress-io/github-action@v6
-      - uses: actions/upload-artifact@v3
-        if: failure()
         with:
-          name: cypress-screenshots
-          path: cypress/screenshots
-          if-no-files-found: ignore
-      - uses: actions/upload-artifact@v3
+          browser: chrome
+      - name: Merge results
+        run: npm run report:merge
+      - name: Generate results
+        run: npm run report:generate
+      - name: Deploy reports page
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          name: cypress-videos
-          path: cypress/videos
-          if-no-files-found: ignore
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public

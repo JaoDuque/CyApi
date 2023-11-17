@@ -1,0 +1,12 @@
+{
+    "reporterEnabled": "mochawesome",
+    "mochawesomeReporterOptions": {
+      "reportDir": "cypress/results/json",
+      "quiet": true,
+      "overwrite": false,
+      "html": false,
+      "json": true,
+      "video": true,
+      "videosFolder":"cypress/results/videos"
+    }
+  }
